@@ -90,24 +90,71 @@ class Game:
         occupier = self.board[trow][tcol]
 
         if occupier is not None:
-            assert occupier.color == piece.color
+            assert occupier.color != piece.color
+            # Capture
+
+
         # Bounds check
 
         # check if the position is out of bounds
         if piece.type == PieceType.Pawn:
             return self.verify_pawn_move(piece.location, to_location, piece.color)
         elif piece.type == PieceType.Knight:
-            return self.verify_night_move(piece.location, to_location, piece.color)
+            return self.verify_night_move(piece.location, to_location)
+        elif piece.type == PieceType.Bishop:
+            return self.verify_bishop_move(piece.location, to_location)
+        elif piece.type == PieceType.Rook:
+            return self.verify_rook_move(piece.location, to_location)
 
         return False
 
-    def verify_night_move(self, from_location: (int, int), to_location: (int, int), team_color: TeamColor):
+    def verify_night_move(self, from_location: (int, int), to_location: (int, int)):
         # Moves in an L shape
         frow, fcol = from_location
         trow, tcol = to_location
         if (abs(frow - trow) == 1 and abs(frow - fcol) == 2) or (abs(frow - trow) == 2 and abs(fcol - tcol) == 1):
             return True
         return False
+
+    def verify_bishop_move(self, from_location: (int, int), to_location: (int, int)):
+        frow, fcol = from_location
+        trow, tcol = to_location
+        # Diagonal
+        assert frow - trow == fcol - tcol
+        # check blocks
+        for i in range(1, abs(frow - trow) + 1):
+            if trow > frow:
+                assert self.board[frow + i][fcol + i] is None
+            else:
+                assert self.board[frow - i][fcol - i] is None
+
+        return True
+
+    def verify_rook_move(self, from_location: (int, int), to_location: (int, int)):
+        frow, fcol = from_location
+        trow, tcol = to_location
+
+        # Horizontal or vertical
+        assert frow != trow and fcol == tcol or frow == trow and fcol != tcol
+
+        distance = abs(frow - trow) + abs(fcol - tcol)
+        for i in range(1, distance):
+            # v down, v up, h left, h right
+            if frow != trow and frow > trow:
+                assert self.board[frow - i][fcol] is None
+            elif frow != trow and frow < trow:
+                assert self.board[frow + i][fcol] is None
+            elif fcol < tcol:
+                assert self.board[frow][fcol + i] is None
+            elif fcol > tcol:
+                assert self.board[frow][fcol - i] is None
+            else:
+                return False
+
+        return True
+
+
+
 
     def verify_pawn_move(self, from_location: (int, int), to_location: (int, int), teamColor: TeamColor):
         has_moved = (from_location == 1 and teamColor == TeamColor.White) or (from_location == 6 and teamColor == TeamColor.Black)
@@ -169,6 +216,19 @@ def display_board(board):
 
 if __name__ == '__main__':
     game = Game()
-    p = game.white.pieces[10]
-    game.move_piece(p, (2, 2))
+    p = game.white.pieces[12]
+    pawn = game.white.pieces[3]
+    game.move_piece(pawn, (3,3))
+    display_board(game.board)
+    game.move_piece(p, (3, 5))
+    display_board(game.board)
+    game.move_piece(p, (0, 2))
+    rook = game.white.pieces[8]
+    apawn = game.white.pieces[0]
+    game.move_piece(apawn, (3,0))
+    game.move_piece(rook, (2,0))
+    game.move_piece(rook, (2,6))
+    game.move_piece(rook, (6,6))
+    game.move_piece(rook, (7,6))
+    game.move_piece(rook, (7,5))
     display_board(game.board)
