@@ -1,6 +1,3 @@
-import matplotlib.pyplot as plt
-import numpy as np
-from matplotlib.patches import Rectangle
 from enum import Enum
 
 
@@ -100,6 +97,20 @@ class Game:
             return self.verify_night_move(piece.location, to_location, piece.color)
 
         return False
+    def verify_bishcop_move(self, from_location: (int, int), to_location: (int, int)):
+        # 2 Check if there is no piece in the way
+        # 1 Check if it's a diagonal move
+        pass
+
+    def verify_rook_move(self, from_location: (int, int), to_location: (int, int)):
+        pass
+
+    def verify_queen_move(self,from_location: (int, int), to_location: (int, int)):
+        pass
+
+    def verify_king_move(self, from_location: (int, int), to_location: (int, int)):
+        pass
+
 
     def verify_night_move(self, from_location: (int, int), to_location: (int, int), team_color: TeamColor):
         # Moves in an L shape
